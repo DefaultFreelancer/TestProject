@@ -13,10 +13,21 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Front routers
+Route::get('/','FrontController@index')->name('index');
 
+// Auth routers
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+// User routers
+Route::prefix('/user')->namespace('Auth')->group(function (){
+    Route::get('/', 'UserController@index')->name('user');
+    Route::post('/{id}', 'UserController@update')->name('user.update');
+});
+
+// Dashboard routers
+Route::prefix('dashboard/')->group(function (){
+    Route::get('/','MainController@index')->name('dashboard');
+    Route::get('/calendar','MainController@calendar')->name('dashboard.calendar');
+});
+
