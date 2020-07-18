@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -26,7 +27,7 @@ Route::prefix('/user')->namespace('Auth')->group(function (){
 });
 
 // Dashboard routers
-Route::prefix('dashboard/')->group(function (){
+Route::prefix('/dashboard')->group(function (){
     Route::get('/','MainController@index')->name('dashboard');
     Route::get('/calendar','MainController@calendar')->name('dashboard.calendar');
 });
