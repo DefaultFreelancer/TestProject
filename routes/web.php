@@ -27,8 +27,8 @@ Route::prefix('/user')->namespace('Auth')->group(function (){
 });
 
 // Dashboard routers
-Route::prefix('/dashboard')->group(function (){
-    Route::get('/','MainController@index')->name('dashboard');
+Route::prefix('/dash')->group(function (){
+    Route::get('/','MainController@index')->name('dashboard.index');
     Route::get('/calendar','MainController@calendar')->name('dashboard.calendar');
 });
 
