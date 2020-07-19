@@ -15,6 +15,11 @@ class CreateEventsTable extends Migration
     {
         Schema::create('events', function (Blueprint $table) {
             $table->id();
+            $table->string('name', 255);
+            $table->text('description');
+            $table->dateTime('starts_at');
+            $table->dateTime('ends_at');
+
             $table->unsignedBigInteger('category_id');
             $table->foreign('category_id')->references('id')->on('event_categories');
             $table->unsignedBigInteger('user_id');

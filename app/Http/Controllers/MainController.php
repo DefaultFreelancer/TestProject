@@ -24,7 +24,7 @@ class MainController extends Controller
 
     public function index()
     {
-        return view('dashboard/index');
+        return view('dashboard/index', ['events' => Event::all()]);
     }
 
 

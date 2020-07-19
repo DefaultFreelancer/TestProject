@@ -32,6 +32,6 @@ Route::prefix('/dash')->group(function (){
     Route::get('/calendar','MainController@calendar')->name('dashboard.calendar');
     Route::post('/event/new', 'MainController@createEvent')->name('event.new');
     Route::post('/event/delete', 'MainController@deleteEvent')->name('event.delete');
-    Route::put('/event/update/{id}', 'MainController@updateEvent')->name('event.update.{id}');
+    Route::put('/event/update/{id}', 'MainController@updateEvent')->name('event.update');
 });
 
