@@ -1,5 +1,6 @@
 @extends('layouts.dashboard')
 
 @section('content')
-    THis is calendar page
+
+    <calendar-component></calendar-component>
 @endsection

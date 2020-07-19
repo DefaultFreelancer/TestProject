@@ -127,9 +127,9 @@
 
         <!-- Main content -->
         <section class="content">
-
-            @yield('content')
-
+            <div id="app">
+                @yield('content')
+            </div>
         </section>
         <!-- /.content -->
     </div>
@@ -155,6 +155,8 @@
 <script src="{{ asset('dashboard/dist/js/adminlte.min.js') }}"></script>
 <!-- AdminLTE for demo purposes -->
 <script src="{{ asset('dashboard/dist/js/demo.js') }}"></script>
+
+<script src="{{ asset('js/app.js') }}" defer></script>
 
 
 </body>

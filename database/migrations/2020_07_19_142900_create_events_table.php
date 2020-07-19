@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateGameCategoriesTable extends Migration
+class CreateEventsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,10 @@ class CreateGameCategoriesTable extends Migration
      */
     public function up()
     {
-        Schema::create('game_categories', function (Blueprint $table) {
+        Schema::create('events', function (Blueprint $table) {
             $table->id();
-            $table->string('Name', 255)->nullable();
+            $table->unsignedBigInteger('category_id');
+            $table->foreign('category_id')->references('id')->on('event_categories');
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
             $table->timestamps();
@@ -29,6 +30,6 @@ class CreateGameCategoriesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('game_categories');
+        Schema::dropIfExists('events');
     }
 }
