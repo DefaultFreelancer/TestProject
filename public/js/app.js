@@ -19349,25 +19349,36 @@ __webpack_require__.r(__webpack_exports__);
     FullCalendar: _fullcalendar_vue__WEBPACK_IMPORTED_MODULE_0__["default"] // make the <FullCalendar> tag available
 
   },
+  props: ['calledEvents'],
   data: function data() {
     return {
+      // calledEvents: [],
       calendarOptions: {
         plugins: [_fullcalendar_daygrid__WEBPACK_IMPORTED_MODULE_1__["default"], _fullcalendar_timegrid__WEBPACK_IMPORTED_MODULE_2__["default"], _fullcalendar_interaction__WEBPACK_IMPORTED_MODULE_3__["default"], _fullcalendar_list__WEBPACK_IMPORTED_MODULE_4__["default"]],
         initialView: 'dayGridMonth',
         dateClick: this.handleDateClick,
-        events: [{
-          title: 'event 1',
-          date: '2019-04-01'
-        }, {
-          title: 'event 2',
-          date: '2019-04-02'
-        }]
+        events: {}
       }
     };
   },
+  created: function created() {
+    console.log(this.calledEvents);
+  },
   methods: {
-    handleDateClick: function handleDateClick(arg) {
-      alert('date click! ' + arg.dateStr);
+    handleDateClick: function handleDateClick(arg) {// alert('date click! ' + arg.dateStr)
+    },
+    handleSelect: function handleSelect(arg) {
+      console.log(arg);
+    },
+    renderEvent: function renderEvent(arg) {
+      var span = document.createElement('span');
+      span.setAttribute('class', 'fa fa-comments');
+      arg.el.appendChild(span);
+      span.addEventListener('click', function (event) {
+        event.stopPropagation(); // this.$modal.show(CommentsModal, {
+        //     text: "This is for the comments"
+        // })
+      });
     }
   }
 });
@@ -55780,7 +55791,12 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c(
     "div",
-    [_c("FullCalendar", { attrs: { options: _vm.calendarOptions } })],
+    [
+      _c("FullCalendar", {
+        attrs: { options: _vm.calendarOptions },
+        on: { select: _vm.handleSelect, eventRender: _vm.renderEvent }
+      })
+    ],
     1
   )
 }

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <FullCalendar :options="calendarOptions" />
+        <FullCalendar :options="calendarOptions" @select="handleSelect" @eventRender="renderEvent" />
     </div>
 </template>
 
@@ -15,23 +15,41 @@
         components: {
             FullCalendar // make the <FullCalendar> tag available
         },
+        props: ['calledEvents'],
         data() {
             return {
+                // calledEvents: [],
                 calendarOptions: {
                     plugins: [ dayGridPlugin, TimeGridPlugin, InteractionPlugin, ListPlugin ],
                     initialView: 'dayGridMonth',
                     dateClick: this.handleDateClick,
-                    events: [
-                        { title: 'event 1', date: '2019-04-01' },
-                        { title: 'event 2', date: '2019-04-02' }
-                    ]
+                    events: {}
                 }
             }
         },
+        created () {
+            console.log(this.calledEvents);
+        },
         methods: {
             handleDateClick: function(arg) {
-                alert('date click! ' + arg.dateStr)
-            }
+                // alert('date click! ' + arg.dateStr)
+            },
+            handleSelect: function (arg) {
+                console.log(arg)
+            },
+            renderEvent: function (arg) {
+                let span = document.createElement('span')
+                span.setAttribute('class', 'fa fa-comments')
+                arg.el.appendChild(span)
+                span.addEventListener('click', event => {
+                    event.stopPropagation();
+                    // this.$modal.show(CommentsModal, {
+                    //     text: "This is for the comments"
+                    // })
+                })
+            },
+
+
         }
     }
 </script>

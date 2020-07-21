@@ -1,5 +1,5 @@
 @extends('layouts.dashboard')
 
 @section('content')
-    <calendar-component></calendar-component>
+    <calendar-component calledEvents="{{ $events }}"></calendar-component>
 @endsection
