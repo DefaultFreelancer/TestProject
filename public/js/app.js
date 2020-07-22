@@ -19347,30 +19347,47 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
-    FullCalendar: _fullcalendar_vue__WEBPACK_IMPORTED_MODULE_0__["default"] // make the <FullCalendar> tag available
-
+    FullCalendar: _fullcalendar_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
   },
   props: ['calledEvents'],
   data: function data() {
     return {
       calendarOptions: {
         plugins: [_fullcalendar_daygrid__WEBPACK_IMPORTED_MODULE_1__["default"], _fullcalendar_timegrid__WEBPACK_IMPORTED_MODULE_2__["default"], _fullcalendar_interaction__WEBPACK_IMPORTED_MODULE_3__["default"], _fullcalendar_list__WEBPACK_IMPORTED_MODULE_4__["default"]],
-        initialView: 'dayGridMonth',
-        dateClick: this.handleDateClick,
-        events: {}
+        selectable: true,
+        droppable: true,
+        initialView: 'timeGridWeek',
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        select: this.handleSelectClick,
+        events: []
       },
-      showModal: false
+      showModal: false,
+      activeEvent: {}
     };
   },
   created: function created() {
-    console.log(this.calledEvents);
+    var _this = this;
+
+    JSON.parse(this.calledEvents).map(function (event) {
+      var starts = new Date(event.starts_at);
+      var ends = new Date(event.ends_at);
+
+      _this.calendarOptions.events.push({
+        id: event.id,
+        title: event.name,
+        startRecur: starts.toISOString(),
+        endRecur: ends.toISOString()
+      });
+    });
   },
   methods: {
-    handleDateClick: function handleDateClick(arg) {
-      this.showModal = true;
-    },
-    handleSelect: function handleSelect(arg) {
-      console.log(arg);
+    handleSelectClick: function handleSelectClick(arg, err) {
+      this.activeEvent = arg;
+      this.showModal = true; // console.log(this.activeEvent)
     },
     renderEvent: function renderEvent(arg) {
       var span = document.createElement('span');
@@ -19521,6 +19538,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "Modal",
+  props: ['activeDate'],
   data: function data() {
     return {
       modalStatus: false
@@ -19530,6 +19548,9 @@ __webpack_require__.r(__webpack_exports__);
     closeModal: function closeModal(arg) {
       console.log(this.modalStatus);
     }
+  },
+  mounted: function mounted() {
+    console.log(this.activeDate);
   }
 });
 
@@ -55881,11 +55902,12 @@ var render = function() {
     [
       _c("FullCalendar", {
         attrs: { options: _vm.calendarOptions },
-        on: { select: _vm.handleSelect, eventRender: _vm.renderEvent }
+        on: { eventRender: _vm.renderEvent }
       }),
       _vm._v(" "),
       _vm.showModal
         ? _c("Modal", {
+            attrs: { "active-date": _vm.activeEvent },
             on: {
               close: function($event) {
                 _vm.showModal = false

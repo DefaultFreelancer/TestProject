@@ -1,7 +1,7 @@
 <template>
     <div>
-        <FullCalendar :options="calendarOptions" @select="handleSelect" @eventRender="renderEvent" />
-        <Modal v-if="showModal" @close="showModal = false"></Modal>
+        <FullCalendar :options="calendarOptions" @eventRender="renderEvent" />
+        <Modal v-if="showModal" :active-date="activeEvent"  @close="showModal = false"></Modal>
     </div>
 </template>
 
@@ -14,31 +14,44 @@
 
 
     export default {
-        components: {
-            FullCalendar // make the <FullCalendar> tag available
-        },
+        components: { FullCalendar },
         props: ['calledEvents'],
         data() {
             return {
                 calendarOptions: {
                     plugins: [ dayGridPlugin, TimeGridPlugin, InteractionPlugin, ListPlugin ],
-                    initialView: 'dayGridMonth',
-                    dateClick: this.handleDateClick,
-                    events: {}
+                    selectable: true,
+                    droppable: true,
+                    initialView: 'timeGridWeek',
+                    headerToolbar: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                    },
+                    select: this.handleSelectClick,
+                    events: []
                 },
-                showModal: false
+                showModal: false,
+                activeEvent: {}
             }
         },
         created () {
-            console.log(this.calledEvents);
+            JSON.parse(this.calledEvents).map((event) => {
+                const starts = new Date(event.starts_at);
+                const ends = new Date(event.ends_at);
+                this.calendarOptions.events.push({
+                    id: event.id,
+                    title: event.name,
+                    startRecur: starts.toISOString(),
+                    endRecur: ends.toISOString()
+                })
+            });
         },
         methods: {
-            handleDateClick: function(arg) {
-                this.showModal = true;
-
-            },
-            handleSelect: function (arg) {
-                console.log(arg)
+            handleSelectClick: function (arg, err) {
+                this.activeEvent = arg
+                this.showModal = true
+                // console.log(this.activeEvent)
             },
             renderEvent: function (arg) {
                 let span = document.createElement('span')
@@ -48,7 +61,7 @@
                     event.stopPropagation();
 
                 })
-            },
+            }
 
 
         }

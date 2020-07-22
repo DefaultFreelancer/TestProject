@@ -33,16 +33,20 @@
 <script>
     export default {
         name: "Modal",
+        props: ['activeDate'],
         data() {
             return {
-                modalStatus: false
+                modalStatus: false,
             }
         },
         methods: {
             closeModal: function (arg) {
                 console.log(this.modalStatus)
+            },
+        },
+        mounted() {
+            console.log(this.activeDate);
 
-            }
         }
     }
 </script>
