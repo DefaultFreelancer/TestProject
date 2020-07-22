@@ -1,6 +1,7 @@
 <template>
     <div>
         <FullCalendar :options="calendarOptions" @select="handleSelect" @eventRender="renderEvent" />
+        <Modal v-if="showModal" @close="showModal = false"></Modal>
     </div>
 </template>
 
@@ -11,6 +12,7 @@
     import InteractionPlugin from '@fullcalendar/interaction'
     import ListPlugin from '@fullcalendar/list'
 
+
     export default {
         components: {
             FullCalendar // make the <FullCalendar> tag available
@@ -18,13 +20,13 @@
         props: ['calledEvents'],
         data() {
             return {
-                // calledEvents: [],
                 calendarOptions: {
                     plugins: [ dayGridPlugin, TimeGridPlugin, InteractionPlugin, ListPlugin ],
                     initialView: 'dayGridMonth',
                     dateClick: this.handleDateClick,
                     events: {}
-                }
+                },
+                showModal: false
             }
         },
         created () {
@@ -32,7 +34,8 @@
         },
         methods: {
             handleDateClick: function(arg) {
-                // alert('date click! ' + arg.dateStr)
+                this.showModal = true;
+
             },
             handleSelect: function (arg) {
                 console.log(arg)
@@ -43,9 +46,7 @@
                 arg.el.appendChild(span)
                 span.addEventListener('click', event => {
                     event.stopPropagation();
-                    // this.$modal.show(CommentsModal, {
-                    //     text: "This is for the comments"
-                    // })
+
                 })
             },
 
