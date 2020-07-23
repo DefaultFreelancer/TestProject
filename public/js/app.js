@@ -19382,7 +19382,8 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
       },
       showModal: false,
       activeEvent: {},
-      eventStatus: ''
+      eventStatus: '',
+      currentEvent: {}
     };
   },
   created: function created() {
@@ -19404,7 +19405,14 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
     },
     addedEventHandler: function addedEventHandler(arg) {
       this.eventStatus = arg.message;
-      console.log(arg.data.get('name'));
+      this.currentEvent = JSON.parse(arg.data);
+      this.calendarOptions.events.push({
+        id: this.currentEvent.id,
+        title: this.currentEvent.name,
+        startRecur: this.currentEvent.starts_at,
+        endRecur: this.currentEvent.ends_at
+      });
+      console.log(JSON.parse(arg.data));
     }
   }
 });
@@ -19616,7 +19624,7 @@ var axios = __webpack_require__(/*! axios */ "./node_modules/axios/index.js")["d
 
         _this.$emit('addedEvent', {
           'message': arg.data.success,
-          'data': formData
+          'data': arg.data.event
         });
       })["catch"](function (error) {
         if (error) {

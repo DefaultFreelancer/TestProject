@@ -97,7 +97,7 @@
                 axios.post(`/dash/event/new`, formData, {'Content-Type': 'application/json'})
                     .then(arg =>{
                         this.$emit('close')
-                        this.$emit('addedEvent',{'message': arg.data.success, 'data': formData})
+                        this.$emit('addedEvent',{'message': arg.data.success, 'data': arg.data.event})
                     })
                     .catch(error => {
                         if(error) {

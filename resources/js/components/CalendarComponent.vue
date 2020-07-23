@@ -43,7 +43,8 @@
                 },
                 showModal: false,
                 activeEvent: {},
-                eventStatus: ''
+                eventStatus: '',
+                currentEvent: {}
             }
         },
         created () {
@@ -64,7 +65,14 @@
             },
             addedEventHandler: function(arg) {
                 this.eventStatus = arg.message
-                console.log(arg.data.get('name'));
+                this.currentEvent = JSON.parse(arg.data)
+                this.calendarOptions.events.push({
+                    id: this.currentEvent.id,
+                    title: this.currentEvent.name,
+                    startRecur: this.currentEvent.starts_at,
+                    endRecur: this.currentEvent.ends_at
+                });
+                console.log(JSON.parse(arg.data));
             }
 
 

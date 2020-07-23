@@ -42,7 +42,7 @@ class MainController extends Controller
     public function createEvent(NewEventRequest $request)
     {
         try{
-            Event::create([
+            $event = Event::create([
                 'name'          => $request['name'],
                 'description'   => $request['description'],
                 'category_id'   => $request['category_id'],
@@ -54,7 +54,7 @@ class MainController extends Controller
         } catch (\Exception $exception){
             return response()->json(['error', __('Event cannot be created!')]);
         }
-        return response()->json(['success' => __('Event is created!')], 200);
+        return response()->json(['success' => __('Event is created!'), 'event' => json_encode($event)], 200);
     }
 
 
