@@ -12,7 +12,7 @@ class EventCategorySeeder extends Seeder
      */
     public function run()
     {
-        foreach (['Football','Golf','Horse','Basketball','Hockey'] as $cat)
+        foreach (['Default Event','Football','Golf','Horse','Basketball','Hockey'] as $cat)
             EventCategory::create(['name' => $cat, 'user_id' => 1]);
     }
 }

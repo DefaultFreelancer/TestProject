@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Event extends Model
 {
 
+    protected $fillable = ['name','description','category_id','starts_at', 'ends_at', 'user_id'];
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */

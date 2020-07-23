@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class EventCategory extends Model
 {
 
+    protected $hidden = ['user_id', 'created_at', 'updated_at'];
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */

@@ -25,7 +25,7 @@ class NewEventRequest extends FormRequest
     {
         return [
             'name' => 'required',
-            'description' => 'text',
+            'description' => 'string',
             'category_id' => 'required|integer',
             'starts_at' => 'required|date',
             'ends_at' => 'date',

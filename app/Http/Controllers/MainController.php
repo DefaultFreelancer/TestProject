@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Event;
+use App\EventCategory;
 use App\Http\Requests\NewEventRequest;
 use App\Http\Requests\UpdateEventRequest;
 use Illuminate\Http\Request;
@@ -30,7 +31,7 @@ class MainController extends Controller
 
     public function calendar()
     {
-        return view('dashboard/calendar', ['events' => Event::all()]);
+        return view('dashboard/calendar', ['events' => Event::all(), 'categories' => EventCategory::all()]);
     }
 
 

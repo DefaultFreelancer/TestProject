@@ -6,22 +6,52 @@
 
                     <div class="modal-header">
                         <slot name="header">
-                            default header
+                            Create Event
+                            <button type="button" class="close" aria-label="Close" @click="$emit('close')">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
                         </slot>
                     </div>
 
                     <div class="modal-body">
                         <slot name="body">
-                            default body
+                            <div class="form-group">
+                                <label >Event name</label>
+                                <input type="text"  class="form-control" v-model="name">
+                            </div>
+                            <div class="form-group">
+                                <label >Event Category</label>
+                                <select class="form-control" v-model="category_id">
+                                    <option v-for="cat in JSON.parse(this.eventCategories)" :value="cat.id">{{ cat.name }}</option>
+                                </select>
+                            </div>
+                            <div class="row form-group">
+                                <div class="col-sm-6">
+                                    <label >Event starts</label>
+                                    <input type="datetime-local" v-model="startDate" name="birthdaytime">
+                                </div>
+                                <div class="col-sm-6">
+                                    <label >Event ends</label>
+                                    <input type="datetime-local" v-model="endDate"  name="birthdaytime">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Event description</label>
+                                <textarea class="form-control" v-model="description" rows="3"></textarea>
+                            </div>
                         </slot>
+                    </div>
+                    <div v-if="formErrors.length" class="form-group">
+                        <div v-for="error in formErrors">
+                            <div class="alert alert-danger" role="alert">
+                                {{ error }}
+                            </div>
+                        </div>
                     </div>
 
                     <div class="modal-footer">
                         <slot name="footer">
-                            default footer
-                            <button class="modal-default-button" @click="$emit('close')">
-                                OK
-                            </button>
+                            <button type="submit" class="btn btn-primary" @click="handleEventSubmit">Submit</button>
                         </slot>
                     </div>
                 </div>
@@ -31,22 +61,66 @@
 </template>
 
 <script>
+    const moment = require('moment');
+    const axios = require('axios').default;
     export default {
         name: "Modal",
-        props: ['activeDate'],
+        props: ['activeDate','eventCategories'],
         data() {
             return {
                 modalStatus: false,
+                endEventStatus: false,
+                name: '',
+                description: '',
+                category_id: 1,
+                endDate: '',
+                startDate: '',
+                formErrors: [],
+                csrf: '',
+                responseMessage: ''
             }
         },
         methods: {
-            closeModal: function (arg) {
-                console.log(this.modalStatus)
+            handleEventSubmit: function (arg, err){
+                this.validateForm();
+                if(this.formErrors.length)
+                    return
+
+                const formData = new FormData()
+                formData.append('_token', this.csrf)
+                formData.append('name',this.name)
+                formData.append('description',this.description)
+                formData.append('category_id',this.category_id)
+                formData.append('starts_at',this.startDate)
+                formData.append('ends_at',this.endDate)
+
+                axios.post(`/dash/event/new`, formData, {'Content-Type': 'application/json'})
+                    .then(arg =>{
+                        this.$emit('close')
+                        this.$emit('addedEvent',{'message': arg.data.success, 'data': formData})
+                    })
+                    .catch(error => {
+                        if(error) {
+                            let errors = Object.entries(error.response.data.errors)
+                            errors.map((error) => {
+                                this.formErrors.push(error[1][0])
+                            });
+                        }
+                });
             },
+            validateForm: function(){
+                this.formErrors = []
+                if(this.startDate > this.endDate)
+                    this.formErrors.push('End date cannot be smaller than Start date')
+
+                if(this.name == '')
+                    this.formErrors.push('Name is required!')
+            }
         },
         mounted() {
-            console.log(this.activeDate);
-
+            this.csrf = document.querySelector('input[name="_token"]').value
+            this.startDate = moment(new Date(this.activeDate.startStr).toISOString()).format('YYYY-MM-DDTHH:mm:ss');
+            this.endDate = moment(new Date(this.activeDate.endStr).toISOString()).format('YYYY-MM-DDTHH:mm:ss');
         }
     }
 </script>
@@ -70,7 +144,8 @@
     }
 
     .modal-container {
-        width: 300px;
+        width: 100%;
+        max-width: 550px;
         margin: 0px auto;
         padding: 20px 30px;
         background-color: #fff;
@@ -87,27 +162,6 @@
 
     .modal-body {
         margin: 20px 0;
-    }
-
-    .modal-default-button {
-        float: right;
-    }
-
-    /*
-     * The following styles are auto-applied to elements with
-     * transition="modal" when their visibility is toggled
-     * by Vue.js.
-     *
-     * You can easily play with the modal transition by editing
-     * these styles.
-     */
-
-    .modal-enter {
-        opacity: 0;
-    }
-
-    .modal-leave-active {
-        opacity: 0;
     }
 
     .modal-enter .modal-container,
