@@ -5,7 +5,7 @@
                 {{ eventStatus }}
             </div>
         </div>
-        <FullCalendar :options="calendarOptions" />
+        <FullCalendar :options="calendarOptions"/>
         <Modal v-if="showModal" :active-date="activeEvent" :event-categories="eventsCategory" @addedEvent="addedEventHandler"  @close="showModal = false"></Modal>
     </div>
 </template>
@@ -37,7 +37,7 @@
                     events: [],
                     buttonIcons: false, // show the prev/next text
                     weekNumbers: true,
-                    navLinks: true, // can click day/week names to navigate views
+                    eventClick: this.handleEventUpdate,
                     editable: true,
                     dayMaxEvents: true
                 },
@@ -54,11 +54,15 @@
                     title: event.name,
                     startRecur: moment(new Date(event.starts_at).toISOString()).format('YYYY-MM-DDTHH:mm:ss'),
                     endRecur: moment(new Date(event.ends_at).toISOString()).format('YYYY-MM-DDTHH:mm:ss'),
+                    extendedProps: {
+                        description: event.description
+                    },
                 })
             });
         },
         methods: {
             handleSelectClick: function (arg, err) {
+                console.log(arg)
                 this.activeEvent = arg
                 this.showModal = true
 
@@ -72,11 +76,25 @@
                     startRecur: this.currentEvent.starts_at,
                     endRecur: this.currentEvent.ends_at
                 });
-                console.log(JSON.parse(arg.data));
+                console.log(FullCalendar);
+            },
+            handleEventUpdate: function(id){
+                console.log(id.event._def.defId);
+                this.activeEvent = { id: id.event._def.defId }
+                this.showModal = true
+            },
+            handleEventDelete: function(event){
+                console.log(event.event.start)
+                console.log(moment(new Date(event.event.start).toISOString()).format('YYYY-MM-DDTHH:mm:ss'))
+                // event.event.remove();
+            },
+            eventRender(event) {
+                const btn = document.createElement("button")
+                btn.appendChild(document.createTextNode("x"))
+                console.log(event)
+                event.el.appendChild(btn)
             }
-
-
-        }
+        },
     }
 </script>
 

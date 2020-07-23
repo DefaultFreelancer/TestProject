@@ -57,6 +57,20 @@ class MainController extends Controller
         return response()->json(['success' => __('Event is created!'), 'event' => json_encode($event)], 200);
     }
 
+    /**
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getEventById($id)
+    {
+        try{
+            $event = Event::findOrFail($id);
+        } catch (\Exception $exception){
+            return response()->json(['error', __('Event cannot be found!')]);
+        }
+        return response()->json(['success' => json_encode($event)]);
+    }
+
 
     /**
      * @param Request $request

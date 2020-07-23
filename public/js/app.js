@@ -19375,8 +19375,7 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
         buttonIcons: false,
         // show the prev/next text
         weekNumbers: true,
-        navLinks: true,
-        // can click day/week names to navigate views
+        eventClick: this.handleEventUpdate,
         editable: true,
         dayMaxEvents: true
       },
@@ -19394,12 +19393,16 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
         id: event.id,
         title: event.name,
         startRecur: moment(new Date(event.starts_at).toISOString()).format('YYYY-MM-DDTHH:mm:ss'),
-        endRecur: moment(new Date(event.ends_at).toISOString()).format('YYYY-MM-DDTHH:mm:ss')
+        endRecur: moment(new Date(event.ends_at).toISOString()).format('YYYY-MM-DDTHH:mm:ss'),
+        extendedProps: {
+          description: event.description
+        }
       });
     });
   },
   methods: {
     handleSelectClick: function handleSelectClick(arg, err) {
+      console.log(arg);
       this.activeEvent = arg;
       this.showModal = true;
     },
@@ -19412,7 +19415,24 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
         startRecur: this.currentEvent.starts_at,
         endRecur: this.currentEvent.ends_at
       });
-      console.log(JSON.parse(arg.data));
+      console.log(_fullcalendar_vue__WEBPACK_IMPORTED_MODULE_0__["default"]);
+    },
+    handleEventUpdate: function handleEventUpdate(id) {
+      console.log(id.event._def.defId);
+      this.activeEvent = {
+        id: id.event._def.defId
+      };
+      this.showModal = true;
+    },
+    handleEventDelete: function handleEventDelete(event) {
+      console.log(event.event.start);
+      console.log(moment(new Date(event.event.start).toISOString()).format('YYYY-MM-DDTHH:mm:ss')); // event.event.remove();
+    },
+    eventRender: function eventRender(event) {
+      var btn = document.createElement("button");
+      btn.appendChild(document.createTextNode("x"));
+      console.log(event);
+      event.el.appendChild(btn);
     }
   }
 });
@@ -19642,6 +19662,10 @@ var axios = __webpack_require__(/*! axios */ "./node_modules/axios/index.js")["d
     }
   },
   mounted: function mounted() {
+    if (this.activeDate.id) {
+      console.log('id is here before');
+    }
+
     this.csrf = document.querySelector('input[name="_token"]').value;
     this.startDate = moment(new Date(this.activeDate.startStr).toISOString()).format('YYYY-MM-DDTHH:mm:ss');
     this.endDate = moment(new Date(this.activeDate.endStr).toISOString()).format('YYYY-MM-DDTHH:mm:ss');

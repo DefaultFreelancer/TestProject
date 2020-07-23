@@ -30,6 +30,7 @@ Route::prefix('/user')->namespace('Auth')->group(function (){
 Route::prefix('/dash')->group(function (){
     Route::get('/','MainController@index')->name('dashboard.index');
     Route::get('/calendar','MainController@calendar')->name('dashboard.calendar');
+    Route::get('/event/get/{id}','MainController@getEventById')->name('event.get');
     Route::post('/event/new', 'MainController@createEvent')->name('event.new');
     Route::post('/event/delete', 'MainController@deleteEvent')->name('event.delete');
     Route::put('/event/update/{id}', 'MainController@updateEvent')->name('event.update');

@@ -118,6 +118,9 @@
             }
         },
         mounted() {
+            if(this.activeDate.id){
+                console.log('id is here before');
+            }
             this.csrf = document.querySelector('input[name="_token"]').value
             this.startDate = moment(new Date(this.activeDate.startStr).toISOString()).format('YYYY-MM-DDTHH:mm:ss');
             this.endDate = moment(new Date(this.activeDate.endStr).toISOString()).format('YYYY-MM-DDTHH:mm:ss');
