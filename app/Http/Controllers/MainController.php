@@ -71,6 +71,14 @@ class MainController extends Controller
         return response()->json(['success' => json_encode($event)]);
     }
 
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getEvents()
+    {
+        return response()->json(['events' => json_encode(Event::all())]);
+    }
+
 
     /**
      * @param Request $request
@@ -79,12 +87,12 @@ class MainController extends Controller
     public function deleteEvent(Request $request)
     {
         try {
-            $event = Event::findOrFail($request['id']);
+            $event = Event::find($request['id']);
             $event->delete();
         } catch (\Exception $exception){
             return response()->json(['error', __('Event cannot be deleted!')]);
         }
-        return response()->json(['success' => __('Event is deleted!')], 200);
+        return response()->json(['success' => __("Event {$event->name} is deleted!")], 200);
     }
 
 
@@ -96,18 +104,17 @@ class MainController extends Controller
     public function updateEvent(UpdateEventRequest $request, $id)
     {
         try {
-            $event = Event::findOrFail($request['id']);
+            $event = Event::find($id);
             $event->name = $request['name'];
             $event->description = $request['description'];
             $event->category_id = $request['category_id'];
             $event->starts_at = $request['starts_at'];
             $event->ends_at = $request['ends_at'];
             $event->save();
-
         } catch (\Exception $exception){
             return response()->json(['error', __("Event {$request['name']} cannot be updated!")]);
         }
-        return response()->json(['success' => __("Event {$event->name} is updated!")], 200);
+        return response()->json(['success' => __("Event {$event->name} is updated!"),'event' => json_encode($event)], 200);
     }
 
 }

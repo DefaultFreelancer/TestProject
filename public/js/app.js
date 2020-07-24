@@ -19345,6 +19345,10 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
 
 
 
@@ -19359,6 +19363,7 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
   },
   props: ['calledEvents', 'eventsCategory'],
   data: function data() {
+    // loading props and attributes for vue component
     return {
       calendarOptions: {
         plugins: [_fullcalendar_daygrid__WEBPACK_IMPORTED_MODULE_1__["default"], _fullcalendar_timegrid__WEBPACK_IMPORTED_MODULE_2__["default"], _fullcalendar_interaction__WEBPACK_IMPORTED_MODULE_3__["default"], _fullcalendar_list__WEBPACK_IMPORTED_MODULE_4__["default"]],
@@ -19388,6 +19393,7 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
   created: function created() {
     var _this = this;
 
+    // on component creating receiving and setting events to calendar
     JSON.parse(this.calledEvents).map(function (event) {
       _this.calendarOptions.events.push({
         id: event.id,
@@ -19395,44 +19401,60 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
         startRecur: moment(new Date(event.starts_at).toISOString()).format('YYYY-MM-DDTHH:mm:ss'),
         endRecur: moment(new Date(event.ends_at).toISOString()).format('YYYY-MM-DDTHH:mm:ss'),
         extendedProps: {
-          description: event.description
+          description: event.description,
+          id: event.id
         }
       });
     });
   },
   methods: {
-    handleSelectClick: function handleSelectClick(arg, err) {
-      console.log(arg);
+    // handling on selecting the date and opening the modal
+    handleSelectClick: function handleSelectClick(arg) {
       this.activeEvent = arg;
       this.showModal = true;
     },
     addedEventHandler: function addedEventHandler(arg) {
+      // After the event is added, we are handling the message and adding data to calendar
       this.eventStatus = arg.message;
-      this.currentEvent = JSON.parse(arg.data);
-      this.calendarOptions.events.push({
-        id: this.currentEvent.id,
-        title: this.currentEvent.name,
-        startRecur: this.currentEvent.starts_at,
-        endRecur: this.currentEvent.ends_at
-      });
-      console.log(_fullcalendar_vue__WEBPACK_IMPORTED_MODULE_0__["default"]);
+
+      if (arg.data) {
+        this.updateEventsHandle();
+        this.currentEvent = JSON.parse(arg.data);
+        this.calendarOptions.events.push({
+          id: this.currentEvent.id,
+          title: this.currentEvent.name,
+          startRecur: this.currentEvent.starts_at,
+          endRecur: this.currentEvent.ends_at
+        });
+      }
     },
     handleEventUpdate: function handleEventUpdate(id) {
-      console.log(id.event._def.defId);
+      // Passing the necessary arguments to the modal and opening the modal for update
       this.activeEvent = {
-        id: id.event._def.defId
+        id: id.event._def.publicId,
+        event: id.event
       };
       this.showModal = true;
     },
-    handleEventDelete: function handleEventDelete(event) {
-      console.log(event.event.start);
-      console.log(moment(new Date(event.event.start).toISOString()).format('YYYY-MM-DDTHH:mm:ss')); // event.event.remove();
-    },
-    eventRender: function eventRender(event) {
-      var btn = document.createElement("button");
-      btn.appendChild(document.createTextNode("x"));
-      console.log(event);
-      event.el.appendChild(btn);
+    updateEventsHandle: function updateEventsHandle() {
+      var _this2 = this;
+
+      // After the change was made, we are pulling again data from DB to update the calendar array
+      this.calendarOptions.events = [];
+      axios.get('/dash/event/getEvents').then(function (response) {
+        JSON.parse(response.data.events).map(function (event) {
+          _this2.calendarOptions.events.push({
+            id: event.id,
+            title: event.name,
+            startRecur: moment(new Date(event.starts_at).toISOString()).format('YYYY-MM-DDTHH:mm:ss'),
+            endRecur: moment(new Date(event.ends_at).toISOString()).format('YYYY-MM-DDTHH:mm:ss'),
+            extendedProps: {
+              description: event.description,
+              id: event.id
+            }
+          });
+        });
+      });
     }
   }
 });
@@ -19603,9 +19625,16 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
+//
+//
+//
+//
+//
+var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"); // using moment for format date and time
 
-var axios = __webpack_require__(/*! axios */ "./node_modules/axios/index.js")["default"];
+
+var axios = __webpack_require__(/*! axios */ "./node_modules/axios/index.js")["default"]; // using axios for HTTP calls
+
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "Modal",
@@ -19621,13 +19650,15 @@ var axios = __webpack_require__(/*! axios */ "./node_modules/axios/index.js")["d
       startDate: '',
       formErrors: [],
       csrf: '',
-      responseMessage: ''
+      responseMessage: '',
+      event_id: ''
     };
   },
   methods: {
     handleEventSubmit: function handleEventSubmit(arg, err) {
       var _this = this;
 
+      // handling event form submit
       this.validateForm();
       if (this.formErrors.length) return;
       var formData = new FormData();
@@ -19637,38 +19668,97 @@ var axios = __webpack_require__(/*! axios */ "./node_modules/axios/index.js")["d
       formData.append('category_id', this.category_id);
       formData.append('starts_at', this.startDate);
       formData.append('ends_at', this.endDate);
-      axios.post("/dash/event/new", formData, {
-        'Content-Type': 'application/json'
-      }).then(function (arg) {
-        _this.$emit('close');
 
-        _this.$emit('addedEvent', {
-          'message': arg.data.success,
-          'data': arg.data.event
-        });
-      })["catch"](function (error) {
-        if (error) {
-          var errors = Object.entries(error.response.data.errors);
-          errors.map(function (error) {
-            _this.formErrors.push(error[1][0]);
+      if (this.event_id) {
+        axios.post("/dash/event/update/" + this.event_id, formData, {
+          'Content-Type': 'application/json'
+        }).then(function (arg) {
+          _this.$emit('close');
+
+          _this.$emit('addedEvent', {
+            'message': arg.data.success,
+            'data': arg.data.event
           });
-        }
-      });
+        })["catch"](function (error) {
+          _this.handleError(error);
+        });
+      } else {
+        axios.post("/dash/event/new", formData, {
+          'Content-Type': 'application/json'
+        }).then(function (arg) {
+          _this.$emit('close');
+
+          _this.$emit('addedEvent', {
+            'message': arg.data.success,
+            'data': arg.data.event
+          });
+        })["catch"](function (error) {
+          _this.handleError(error);
+        });
+      }
     },
     validateForm: function validateForm() {
+      // simple form pre validation ( we have one also on backend )
       this.formErrors = [];
       if (this.startDate > this.endDate) this.formErrors.push('End date cannot be smaller than Start date');
       if (this.name == '') this.formErrors.push('Name is required!');
+    },
+    handleError: function handleError(error) {
+      var _this2 = this;
+
+      // simple error handler
+      if (error) {
+        var errors = Object.entries(error.response.data.errors);
+        errors.map(function (error) {
+          _this2.formErrors.push(error[1][0]);
+        });
+      }
+    },
+    deleteEvent: function deleteEvent() {
+      var _this3 = this;
+
+      // deleting method for removing events from calendar ( with confirmation and update all events in calendar )
+      if (confirm("Are you sure you want to delete event " + this.name)) {
+        this.activeDate.event.remove();
+        var formData = new FormData();
+        formData.append('_token', this.csrf);
+        formData.append('_method', 'DELETE');
+        formData.append('id', this.event_id);
+        axios.post("/dash/event/delete", formData, {
+          'Content-Type': 'application/json'
+        }).then(function (arg) {
+          _this3.$emit('addedEvent', {
+            'message': arg.data.success
+          });
+        })["catch"](function (error) {
+          _this3.handleError(error);
+        });
+        this.$emit('close');
+      }
     }
   },
   mounted: function mounted() {
-    if (this.activeDate.id) {
-      console.log('id is here before');
-    }
+    var _this4 = this;
 
+    // receiving data/event for modal when modal is shown
     this.csrf = document.querySelector('input[name="_token"]').value;
-    this.startDate = moment(new Date(this.activeDate.startStr).toISOString()).format('YYYY-MM-DDTHH:mm:ss');
-    this.endDate = moment(new Date(this.activeDate.endStr).toISOString()).format('YYYY-MM-DDTHH:mm:ss');
+
+    if (this.activeDate.id) {
+      axios.get("/dash/event/get/" + this.activeDate.id, {}, {
+        'Content-Type': 'application/json'
+      }).then(function (arg) {
+        var data = JSON.parse(arg.data.success);
+        _this4.name = data.name;
+        _this4.description = data.description;
+        _this4.startDate = moment(new Date(data.starts_at).toISOString()).format('YYYY-MM-DDTHH:mm:ss');
+        _this4.endDate = moment(new Date(data.ends_at).toISOString()).format('YYYY-MM-DDTHH:mm:ss');
+        _this4.event_id = data.id;
+        _this4.category_id = data.category_id;
+      });
+    } else {
+      this.startDate = moment(new Date(this.activeDate.startStr).toISOString()).format('YYYY-MM-DDTHH:mm:ss');
+      this.endDate = moment(new Date(this.activeDate.endStr).toISOString()).format('YYYY-MM-DDTHH:mm:ss');
+    }
   }
 });
 
@@ -77621,6 +77711,16 @@ var render = function() {
             { staticClass: "modal-footer" },
             [
               _vm._t("footer", [
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-danger",
+                    attrs: { type: "submit" },
+                    on: { click: _vm.deleteEvent }
+                  },
+                  [_vm._v("Remove Event")]
+                ),
+                _vm._v(" "),
                 _c(
                   "button",
                   {
