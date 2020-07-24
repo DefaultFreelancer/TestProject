@@ -37,3 +37,6 @@ Route::prefix('/dash')->group(function (){
     Route::post('/event/update/{id}', 'MainController@updateEvent')->name('event.update');
 });
 
+// The route group has been used because of all the methods and gateways where placed on the default dashboard.
+// Since this is the only advanced function on the system, and they can be accessed throw dashboard.
+
