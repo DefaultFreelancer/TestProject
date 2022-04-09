@@ -34,6 +34,6 @@
         "@fullcalendar/resource-timeline": "^5.1.0",
         "@fullcalendar/timegrid": "^5.1.0",
         "@fullcalendar/vue": "^5.1.0",
-        "moment": "^2.27.0"
+        "moment": "^2.29.2"
     }
 }
